@@ -1,0 +1,144 @@
+{
+  "schema_version": "0.2.0",
+  "experiment_id": "ethanol_cyclohexane_water_lle",
+  "experiment_name": "乙醇—环己烷—水三元液液平衡测定",
+  "category": "physical",
+  "status": "draft",
+  "sources": [
+    {
+      "source_id": "user_legacy_guide",
+      "title": "八、液–液传质系数测定--实验讲义.doc（正文实际为三元液液平衡）",
+      "source_type": "instructor_guide",
+      "location": "user-provided://八、液-液传质系数测定--实验讲义.doc",
+      "version": null,
+      "verified": true,
+      "evidence_locator": "旧版 Word 文本层；公式图片未成功提取"
+    },
+    {
+      "source_id": "uestc_lle_paper",
+      "title": "乙醇-环己烷-水三元液液相平衡实验条件探索",
+      "source_type": "research_paper",
+      "location": "https://www.sy.uestc.edu.cn/cn/article/id/823",
+      "version": "2016",
+      "verified": true,
+      "evidence_locator": "用于核对实验体系与教学目标，不替代本次讲义参数"
+    },
+    {
+      "source_id": "scu_course_syllabus",
+      "title": "四川大学化工原理实验课程大纲：三元液液相平衡数据",
+      "source_type": "course_syllabus",
+      "location": "https://pce.scu.edu.cn/syllabus/3p4b3r740j5p5b1qt17k0enqe1/",
+      "version": null,
+      "verified": true,
+      "evidence_locator": "用于核对浊点—物性结合法、三元体系及 K/β 教学要求"
+    }
+  ],
+  "objectives": [
+    {"item_id": "objective_method", "text": "掌握浊点—物性结合法测定三元液液平衡数据的基本方法。", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"item_id": "objective_diagram", "text": "测定固定温度下乙醇—环己烷—水体系的溶解度曲线和联结线，并理解三角相图。", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"item_id": "objective_evaluation", "text": "根据两相组成计算分配系数与选择性系数，用于评价萃取分离性能。", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}
+  ],
+  "principles": [
+    {
+      "principle_id": "cloud_point",
+      "text": "乙醇分别与环己烷和水具有较好的互溶性，而水在环己烷中的溶解度较小。向乙醇—环己烷均相混合物缓慢加水，体系越过双结线后出现稳定浑浊；由各组分的质量可得到该浊点组成。",
+      "equations": ["w_i = m_i / Σm_i × 100%"],
+      "assumptions": ["加水终点取首次出现且不立即消失的浑浊", "称量期间挥发和残留可忽略或得到控制"],
+      "content_status": "source_verified",
+      "evidence_refs": ["user_legacy_guide"]
+    },
+    {
+      "principle_id": "tie_line",
+      "text": "在恒温恒压下，三组分两液相平衡体系按相律只有一个自由度。静置分层后测定上、下相折射率，并通过预先建立的浓度—折射率关系确定两相组成；相图中连接一对平衡相组成的直线即联结线。",
+      "equations": ["F = C - P = 1（恒温恒压，C=3，P=2）"],
+      "assumptions": ["折射率标准曲线与待测样品处于相同温度", "取样不扰动相界面且两相已达到平衡"],
+      "content_status": "source_verified",
+      "evidence_refs": ["user_legacy_guide"]
+    },
+    {
+      "principle_id": "distribution_selectivity",
+      "text": "以乙醇为溶质、水相为萃取相 E、油相为萃余相 R。常用定义可写为乙醇分配系数 K_A=w_A^E/w_A^R，选择性系数 β=(w_A^E/w_B^E)/(w_A^R/w_B^R)=K_A/K_B。因原讲义公式为图片且未成功提取，本符号体系必须在提交前与原版讲义核对。",
+      "equations": ["K_A = w_A^E / w_A^R", "K_B = w_B^E / w_B^R", "β = K_A / K_B"],
+      "assumptions": ["A 为乙醇，B 为环己烷", "质量分数采用同一基准", "公式符号待对照原讲义图片确认"],
+      "content_status": "needs_review",
+      "evidence_refs": ["user_legacy_guide", "uestc_lle_paper", "scu_course_syllabus"]
+    }
+  ],
+  "materials": [
+    {"resource_id": "ethanol", "name": "无水乙醇（分析纯）", "role": "溶质/互溶剂", "parameters": [], "required_metadata": ["批号或纯度"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"resource_id": "cyclohexane", "name": "环己烷（分析纯）", "role": "油相溶剂", "parameters": [], "required_metadata": ["批号或纯度"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"resource_id": "water", "name": "去离子水", "role": "萃取剂/水相组分", "parameters": [], "required_metadata": [], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}
+  ],
+  "instruments": [
+    {"resource_id": "equilibrium_kettle", "name": "液液平衡釜", "role": "恒温混合与平衡", "parameters": [], "required_metadata": ["编号", "设定温度", "实际温度"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"resource_id": "bath", "name": "恒温水浴及恒温槽", "role": "控制平衡釜和折射率测量温度", "parameters": [], "required_metadata": ["设定温度", "实际温度"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"resource_id": "balance", "name": "分析天平", "role": "差量法称量", "parameters": [], "required_metadata": ["型号", "分度值"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"resource_id": "refractometer", "name": "阿贝折射仪", "role": "测量两相折射率", "parameters": [], "required_metadata": ["型号", "校准记录", "测量温度"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"resource_id": "auxiliary", "name": "磁力搅拌器、温度计、注射器、量筒和烧杯", "role": "混合、控温、滴加、取样及转移", "parameters": [], "required_metadata": [], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}
+  ],
+  "safety": {
+    "ppe": ["实验服", "护目镜", "适用的化学防护手套"],
+    "hazards": ["乙醇和环己烷均易燃、易挥发；远离火源、热表面和火花并保持通风", "避免吸入蒸气和皮肤接触；称量、转移和取样后及时封闭容器", "使用注射器取样时避免针具刺伤和两相交叉污染"],
+    "waste": ["含乙醇和环己烷的两相废液不得排入下水道，按本校有机废液规则分类收集", "折射仪清洗液和污染耗材按实验室规定处理"],
+    "emergency": ["泄漏、接触或吸入时立即停止操作并按实验室 SDS、应急预案和教师指令处理", "发生火情时切断热源并使用实验室规定的灭火设施；不要擅自处置大面积泄漏"],
+    "content_status": "needs_review",
+    "evidence_refs": ["user_legacy_guide"]
+  },
+  "planned_steps": [
+    {"step_id": "preflight_01", "stage": "preflight", "action": "核对讲义正文实验名称、平衡釜设定温度、折射率标准曲线、废液桶类别及原版 K/β 公式。", "parameters": [], "expected_observations": [], "hazards": [], "stop_conditions": ["温度或标准曲线未明确", "原版公式无法核对且课程要求必须计算"], "content_status": "needs_review", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "temperature_01", "stage": "preparation", "action": "开启恒温水浴加热，使液液平衡釜温度稳定。", "parameters": [], "expected_observations": ["实际温度在教师规定范围内稳定"], "hazards": ["热表面和电气设备"], "stop_conditions": ["温度持续波动或设备异常"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "charge_01", "stage": "preparation", "action": "采用差量法向平衡釜加入约 5–6 mL 环己烷和约 10–12 mL 无水乙醇，分别记录转移前后质量。", "parameters": [{"name": "环己烷体积", "value": "5–6", "unit": "mL", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}, {"name": "乙醇体积", "value": "10–12", "unit": "mL", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}], "expected_observations": ["混合后形成澄清均一液相"], "hazards": ["易燃、挥发性液体"], "stop_conditions": ["出现泄漏、明显损失或称量记录缺失"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "mix_01", "stage": "operation", "action": "磁力搅拌 2–3 min，使体系混合均匀。", "parameters": [{"name": "搅拌时间", "value": "2–3", "unit": "min", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}], "expected_observations": ["体系保持澄清均一"], "hazards": [], "stop_conditions": ["搅拌子跳动、容器泄漏或温度异常"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "cloud_point_01", "stage": "measurement", "action": "称量装有 2–3 mL 去离子水的注射器，缓慢滴加至首次出现稳定浑浊，立即停止；吸回针尖液滴后复称，以差值得到加水质量。改变乙醇/环己烷用量后重复获得系列浊点。", "parameters": [{"name": "注射器初装水体积", "value": "2–3", "unit": "mL", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}], "expected_observations": ["澄清体系在终点首次出现稳定浑浊"], "hazards": ["终点附近过量滴加", "针具操作"], "stop_conditions": ["一次加入过量导致无法判定首次浑浊", "称量或样品编号无法追溯"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "phase_equilibrium_01", "stage": "measurement", "action": "在浊点体系中再加入 1–2 mL 水，搅拌 1–2 min，停止后静置 15–20 min；分别取上、下相测折射率，并由标准曲线求两相组成。", "parameters": [{"name": "追加水体积", "value": "1–2", "unit": "mL", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}, {"name": "搅拌时间", "value": "1–2", "unit": "min", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}, {"name": "静置时间", "value": "15–20", "unit": "min", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}], "expected_observations": ["形成清晰的上层油相和下层水相"], "hazards": ["取样时扰动界面或交叉污染"], "stop_conditions": ["相界面不清晰", "折射仪未校准或温度不一致"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "tie_lines_01", "stage": "measurement", "action": "继续每次追加 1–2 mL 水并重复平衡、静置、分相取样和折射率测量，共获得 3–4 组数据（讲义目标为 3 条联结线）。", "parameters": [{"name": "数据组数", "value": "3–4", "unit": "组", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}], "expected_observations": ["每组均有可配对的上、下相组成"], "hazards": ["样品编号错配和相别颠倒"], "stop_conditions": ["上、下相样品无法配对", "物料或温度记录中断"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"step_id": "cleanup_01", "stage": "cleanup", "action": "停止设备，按规定回收两相有机废液，清洁平衡釜、注射器和折射仪棱镜，保存原始记录。", "parameters": [], "expected_observations": ["设备和台面清洁，数据文件可追溯"], "hazards": ["有机废液和玻璃器件"], "stop_conditions": ["废液类别不明确时不得倾倒"], "content_status": "needs_review", "evidence_refs": ["user_legacy_guide"]}
+  ],
+  "data_fields": [
+    {"field_id": "run_id", "label": "实验/数据组编号", "data_type": "string", "unit": null, "required": true, "source_method": "人工记录", "content_status": "source_verified"},
+    {"field_id": "room_temperature_c", "label": "室温", "data_type": "number", "unit": "°C", "required": true, "source_method": "温度计", "content_status": "source_verified"},
+    {"field_id": "kettle_temperature_c", "label": "平衡釜实际温度", "data_type": "number", "unit": "°C", "required": true, "source_method": "温度计/设备显示", "content_status": "source_verified"},
+    {"field_id": "pressure_kpa", "label": "大气压力", "data_type": "number", "unit": "kPa", "required": false, "source_method": "实验室记录", "content_status": "source_verified"},
+    {"field_id": "ethanol_mass_g", "label": "乙醇加入质量", "data_type": "number", "unit": "g", "required": true, "source_method": "差量法称量", "content_status": "source_verified"},
+    {"field_id": "cyclohexane_mass_g", "label": "环己烷加入质量", "data_type": "number", "unit": "g", "required": true, "source_method": "差量法称量", "content_status": "source_verified"},
+    {"field_id": "water_mass_g", "label": "水加入质量", "data_type": "number", "unit": "g", "required": true, "source_method": "注射器差量称量", "content_status": "source_verified"},
+    {"field_id": "cloud_point_observation", "label": "浊点观察", "data_type": "string", "unit": null, "required": true, "source_method": "现场原始记录", "content_status": "source_verified"},
+    {"field_id": "upper_refractive_index", "label": "上相折射率", "data_type": "number", "unit": null, "required": true, "source_method": "阿贝折射仪", "content_status": "source_verified"},
+    {"field_id": "lower_refractive_index", "label": "下相折射率", "data_type": "number", "unit": null, "required": true, "source_method": "阿贝折射仪", "content_status": "source_verified"},
+    {"field_id": "upper_ethanol_wt_percent", "label": "上相乙醇质量分数", "data_type": "number", "unit": "%", "required": true, "source_method": "折射率标准曲线/外部处理", "content_status": "needs_review"},
+    {"field_id": "upper_cyclohexane_wt_percent", "label": "上相环己烷质量分数", "data_type": "number", "unit": "%", "required": true, "source_method": "折射率标准曲线/物料衡算", "content_status": "needs_review"},
+    {"field_id": "upper_water_wt_percent", "label": "上相水质量分数", "data_type": "number", "unit": "%", "required": true, "source_method": "折射率标准曲线/物料衡算", "content_status": "needs_review"},
+    {"field_id": "lower_ethanol_wt_percent", "label": "下相乙醇质量分数", "data_type": "number", "unit": "%", "required": true, "source_method": "折射率标准曲线/外部处理", "content_status": "needs_review"},
+    {"field_id": "lower_cyclohexane_wt_percent", "label": "下相环己烷质量分数", "data_type": "number", "unit": "%", "required": true, "source_method": "折射率标准曲线/物料衡算", "content_status": "needs_review"},
+    {"field_id": "lower_water_wt_percent", "label": "下相水质量分数", "data_type": "number", "unit": "%", "required": true, "source_method": "折射率标准曲线/物料衡算", "content_status": "needs_review"}
+  ],
+  "analysis_plan": [
+    {"analysis_id": "cloud_composition", "name": "浊点质量组成", "tier": "automatic", "method": "mass_fraction", "input_field_ids": ["ethanol_mass_g", "cyclohexane_mass_g", "water_mass_g"], "required_outputs": ["三组分质量分数", "质量分数和检查"], "guidance_steps": [], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"analysis_id": "ternary_plot", "name": "三元溶解度曲线与联结线", "tier": "guided", "method": "Origin ternary diagram", "input_field_ids": ["upper_ethanol_wt_percent", "upper_cyclohexane_wt_percent", "upper_water_wt_percent", "lower_ethanol_wt_percent", "lower_cyclohexane_wt_percent", "lower_water_wt_percent"], "required_outputs": ["三元相图", "实验浊点", "3 条联结线", "源数据表", "软件版本"], "guidance_steps": ["将乙醇、环己烷和水质量分数设为三列，并先检查每行合计为 100%。", "导入讲义附录 25°C 参考数据，绘制参考溶解度曲线。", "将实测浊点作为独立散点系列，不与参考数据混为同一来源。", "每条联结线只连接同一数据组的上、下相组成。", "导出源数据 CSV/XLSX 和图表 PNG/SVG/PDF，并记录 Origin 版本。"], "content_status": "source_verified", "evidence_refs": ["user_legacy_guide", "uestc_lle_paper"]},
+    {"analysis_id": "distribution_selectivity", "name": "分配系数与选择性系数", "tier": "automatic", "method": "phase_composition_ratio", "input_field_ids": ["upper_ethanol_wt_percent", "upper_cyclohexane_wt_percent", "lower_ethanol_wt_percent", "lower_cyclohexane_wt_percent"], "required_outputs": ["K_A", "K_B", "β", "公式版本记录"], "guidance_steps": ["先确认上相为油相 R、下相为水相 E。", "提交前对照原讲义公式图片确认 K 与 β 的符号和相别定义。"], "content_status": "needs_review", "evidence_refs": ["user_legacy_guide", "uestc_lle_paper", "scu_course_syllabus"]}
+  ],
+  "quality_rules": [
+    {"rule_id": "mass_fraction_sum", "metric": "component_wt_percent_sum", "operator": "equals", "threshold": 100, "on_fail": "flag", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"rule_id": "phase_pairing", "metric": "upper_lower_phase_same_group", "operator": "equals", "threshold": true, "on_fail": "block_report", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"rule_id": "temperature_consistency", "metric": "equilibrium_and_refractometer_temperature_consistency", "operator": "manual_review", "threshold": null, "on_fail": "request_confirmation", "content_status": "needs_review", "evidence_refs": ["user_legacy_guide"]},
+    {"rule_id": "formula_confirmation", "metric": "distribution_formula_confirmed", "operator": "equals", "threshold": true, "on_fail": "block_report", "content_status": "needs_review", "evidence_refs": ["user_legacy_guide"]},
+    {"rule_id": "plot_traceability", "metric": "plot_rows_match_source_table", "operator": "equals", "threshold": true, "on_fail": "block_report", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}
+  ],
+  "thought_questions": [
+    {"item_id": "question_phase_split", "text": "从热力学角度解释液液分相。", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"item_id": "question_turbidity", "text": "为什么可用澄清到浑浊的变化判断相界？", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"item_id": "question_k_beta", "text": "如何用 K 和 β 评价萃取剂？", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"item_id": "question_tp", "text": "温度和压力对液液平衡有什么影响？", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]},
+    {"item_id": "question_accuracy", "text": "本实验数据准确性的主要影响因素是什么？", "content_status": "source_verified", "evidence_refs": ["user_legacy_guide"]}
+  ],
+  "report_sections": ["preview", "materials_and_conditions", "design", "preflight", "procedure", "observations_and_raw_data", "preprocessing", "results", "quality_assessment", "error_analysis", "discussion", "conclusion", "cleanup_and_archive"],
+  "review": {
+    "guide_confirmed": true,
+    "formulas_confirmed": false,
+    "quality_rules_confirmed": false,
+    "safety_confirmed": false,
+    "confirmed_by": null,
+    "confirmed_at": null,
+    "notes": "用户提供的真实讲义已解析；文件名写‘液–液传质系数’，正文实际为乙醇—环己烷—水三元液液平衡。旧版 DOC 中 K/β 公式为图片且未提取，安全与废液细则也需按本校规定确认。"
+  }
+}
