@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/experiment-spec.schema.json",
+  "title": "ExperimentSpec",
+  "description": "通用化学实验的结构化定义。具体实验参数必须保留来源和人工确认状态。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "experiment_name",
+    "category",
+    "status",
+    "sources",
+    "objectives",
+    "principles",
+    "materials",
+    "instruments",
+    "procedure_steps",
+    "raw_data_fields",
+    "calculations",
+    "charts",
+    "quality_rules",
+    "report_sections",
+    "routing",
+    "review"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1.0" },
+    "experiment_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "experiment_name": { "type": "string", "minLength": 1 },
+    "category": {
+      "type": "string",
+      "enum": ["basic", "inorganic", "analytical", "organic", "physical", "instrumental", "comprehensive"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "source_verified", "human_confirmed", "validated", "deprecated"]
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" },
+      "minItems": 1
+    },
+    "objectives": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "principles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/principle" },
+      "minItems": 1
+    },
+    "materials": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/material" }
+    },
+    "instruments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/instrument" }
+    },
+    "procedure_steps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/procedureStep" },
+      "minItems": 1
+    },
+    "raw_data_fields": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dataField" },
+      "minItems": 1
+    },
+    "calculations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/calculation" }
+    },
+    "charts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/chart" }
+    },
+    "quality_rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/qualityRule" },
+      "minItems": 1
+    },
+    "report_sections": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "preview",
+          "materials_and_conditions",
+          "design",
+          "preflight",
+          "procedure",
+          "observations_and_raw_data",
+          "preprocessing",
+          "results",
+          "quality_assessment",
+          "error_analysis",
+          "discussion",
+          "conclusion",
+          "cleanup_and_archive"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "required_capabilities", "unsupported_capabilities", "on_unsupported"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["common", "special_agent"] },
+        "required_capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "unsupported_capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "on_unsupported": { "type": "string", "enum": ["block_and_request_review", "route_to_special_agent"] },
+        "special_agent_id": { "type": ["string", "null"] }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guide_confirmed", "formulas_confirmed", "quality_rules_confirmed", "safety_confirmed", "confirmed_by", "confirmed_at"],
+      "properties": {
+        "guide_confirmed": { "type": "boolean" },
+        "formulas_confirmed": { "type": "boolean" },
+        "quality_rules_confirmed": { "type": "boolean" },
+        "safety_confirmed": { "type": "boolean" },
+        "confirmed_by": { "type": ["string", "null"] },
+        "confirmed_at": { "type": ["string", "null"], "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "title", "source_type", "location", "verified"],
+      "properties": {
+        "source_id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+        "title": { "type": "string" },
+        "source_type": { "type": "string", "enum": ["instructor_guide", "course_syllabus", "standard", "textbook", "research_paper", "instrument_manual", "reference_database", "internal_record"] },
+        "location": { "type": "string" },
+        "version": { "type": ["string", "null"] },
+        "verified": { "type": "boolean" },
+        "verified_by": { "type": ["string", "null"] }
+      }
+    },
+    "principle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principle_id", "statement", "source_ids", "human_confirmed"],
+      "properties": {
+        "principle_id": { "type": "string" },
+        "statement": { "type": "string" },
+        "equations": { "type": "array", "items": { "type": "string" } },
+        "assumptions": { "type": "array", "items": { "type": "string" } },
+        "source_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "human_confirmed": { "type": "boolean" }
+      }
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material_id", "name", "role", "parameters", "hazards", "waste_stream"],
+      "properties": {
+        "material_id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "parameters": { "type": "array", "items": { "$ref": "#/$defs/parameter" } },
+        "hazards": { "type": "array", "items": { "type": "string" } },
+        "waste_stream": { "type": "string" }
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instrument_id", "name", "required_metadata", "calibration_required"],
+      "properties": {
+        "instrument_id": { "type": "string" },
+        "name": { "type": "string" },
+        "required_metadata": { "type": "array", "items": { "type": "string" } },
+        "calibration_required": { "type": "boolean" },
+        "manual_source_id": { "type": ["string", "null"] }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value_status", "source_id", "human_confirmed"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": ["number", "string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "value_status": { "type": "string", "enum": ["specified", "required_from_guide", "not_applicable"] },
+        "source_id": { "type": ["string", "null"] },
+        "human_confirmed": { "type": "boolean" }
+      }
+    },
+    "procedureStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step_id", "stage", "action", "parameters", "expected_observations", "hazards", "stop_conditions", "source_ids", "human_confirmed"],
+      "properties": {
+        "step_id": { "type": "string" },
+        "stage": { "type": "string", "enum": ["preflight", "calibration", "preparation", "operation", "measurement", "cleanup"] },
+        "action": { "type": "string" },
+        "parameters": { "type": "array", "items": { "$ref": "#/$defs/parameter" } },
+        "expected_observations": { "type": "array", "items": { "type": "string" } },
+        "hazards": { "type": "array", "items": { "type": "string" } },
+        "stop_conditions": { "type": "array", "items": { "type": "string" } },
+        "source_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "human_confirmed": { "type": "boolean" }
+      }
+    },
+    "dataField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field_id", "label", "data_type", "unit", "required", "role", "source_method"],
+      "properties": {
+        "field_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "label": { "type": "string" },
+        "data_type": { "type": "string", "enum": ["number", "integer", "string", "boolean", "datetime", "file"] },
+        "unit": { "type": ["string", "null"] },
+        "required": { "type": "boolean" },
+        "role": { "type": "string", "enum": ["identifier", "condition", "raw_measurement", "observation", "provenance"] },
+        "source_method": { "type": "string" },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" }
+      }
+    },
+    "calculation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["calculation_id", "operation", "formula_display", "input_field_ids", "output_field_id", "output_unit", "source_ids", "assumptions", "human_confirmed"],
+      "properties": {
+        "calculation_id": { "type": "string" },
+        "operation": {
+          "type": "string",
+          "enum": ["unit_conversion", "dilution", "stoichiometry", "blank_correction", "mean", "standard_deviation", "rsd", "yield", "recovery", "linear_regression", "inverse_calibration", "kinetic_fit", "arrhenius_fit", "phase_transition_detection", "custom_whitelisted"]
+        },
+        "formula_display": { "type": "string" },
+        "input_field_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "output_field_id": { "type": "string" },
+        "output_unit": { "type": ["string", "null"] },
+        "source_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "assumptions": { "type": "array", "items": { "type": "string" } },
+        "human_confirmed": { "type": "boolean" }
+      }
+    },
+    "chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chart_id", "chart_type", "x_field_id", "y_field_ids", "required_elements"],
+      "properties": {
+        "chart_id": { "type": "string" },
+        "chart_type": { "type": "string", "enum": ["scatter", "line", "calibration", "residual", "bar", "phase_diagram", "spectrum", "chromatogram"] },
+        "x_field_id": { "type": "string" },
+        "y_field_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "fit_calculation_id": { "type": ["string", "null"] },
+        "required_elements": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "qualityRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "target", "metric", "operator", "severity", "on_fail", "source_ids", "human_confirmed"],
+      "properties": {
+        "rule_id": { "type": "string" },
+        "target": { "type": "string" },
+        "metric": { "type": "string" },
+        "operator": { "type": "string", "enum": ["lt", "lte", "gt", "gte", "between", "equals", "manual_review"] },
+        "threshold": { "type": ["number", "string", "array", "boolean", "null"] },
+        "threshold_status": { "type": "string", "enum": ["specified", "required_from_guide", "method_dependent"] },
+        "severity": { "type": "string", "enum": ["info", "warning", "blocking"] },
+        "on_fail": { "type": "string", "enum": ["flag", "request_confirmation", "require_remeasurement", "block_report"] },
+        "source_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "human_confirmed": { "type": "boolean" }
+      }
+    }
+  }
+}
