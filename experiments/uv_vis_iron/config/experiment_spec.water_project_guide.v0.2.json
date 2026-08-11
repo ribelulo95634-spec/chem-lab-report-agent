@@ -1,0 +1,136 @@
+{
+  "schema_version": "0.2.0",
+  "experiment_id": "uv_vis_water_iron_project_guide",
+  "experiment_name": "邻菲啰啉分光光度法测定水样中铁（项目指导书）",
+  "category": "instrumental",
+  "status": "source_verified",
+  "sources": [
+    {
+      "source_id": "project_guide_v1",
+      "title": "邻菲啰啉分光光度法测定水样中铁_项目编制版",
+      "source_type": "instructor_guide",
+      "location": "materials/01_实验指导书/邻菲啰啉分光光度法测定水样中铁_项目编制版.docx",
+      "version": "1.0 / 2026-08-11",
+      "verified": true,
+      "evidence_locator": "项目编制版全文；不是本校或导师原版"
+    },
+    {
+      "source_id": "report_template_v1",
+      "title": "邻菲啰啉分光光度法测定水样中铁_实验报告模板",
+      "source_type": "internal_record",
+      "location": "materials/03_实验报告模板/邻菲啰啉分光光度法测定水样中铁_实验报告模板.docx",
+      "version": "1.0 / 2026-08-11",
+      "verified": true,
+      "evidence_locator": "17 个报告章节和 20 张记录表"
+    },
+    {
+      "source_id": "hj_t_345_2007",
+      "title": "HJ/T 345—2007 水质 铁的测定 邻菲啰啉分光光度法（试行）",
+      "source_type": "standard",
+      "location": "https://www.mee.gov.cn/ywgz/fgbz/bz/bzwb/jcffbz/200703/t20070316_101687.htm",
+      "version": "2007",
+      "verified": true,
+      "evidence_locator": "方法范围、试剂、校准、测定和结果计算"
+    },
+    {
+      "source_id": "origin_linear_fit",
+      "title": "OriginLab Linear Regression Dialog Box",
+      "source_type": "instrument_manual",
+      "location": "https://docs.originlab.com/origin-help/lr-dialog/",
+      "version": "accessed 2026-08-11",
+      "verified": true,
+      "evidence_locator": "Output、Residual Plots、Fitted Curves Plot"
+    }
+  ],
+  "objectives": [
+    {"item_id": "objective_method", "text": "掌握邻菲啰啉显色和分光光度法测定水样中铁的基本过程。", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"item_id": "objective_record", "text": "建立可追溯的实际操作、现场现象和原始吸光度记录。", "content_status": "source_verified", "evidence_refs": ["project_guide_v1", "report_template_v1"]},
+    {"item_id": "objective_result", "text": "使用铁质量校准模型反算样品中铁质量并换算水样浓度。", "content_status": "source_verified", "evidence_refs": ["project_guide_v1", "hj_t_345_2007"]}
+  ],
+  "principles": [
+    {
+      "principle_id": "phenanthroline_mass_calibration",
+      "text": "将铁还原为 Fe2+，在适宜 pH 下与邻菲啰啉形成橙红色络合物，于 510 nm 测量吸光度；用容量瓶中铁质量建立校准关系。",
+      "equations": ["Fe2+ + 3 Phen -> [Fe(Phen)3]2+", "A_corr = A_raw - A_blank", "A_corr = a + b*m", "m = (A_corr-a)/b", "rho(Fe, mg/L) = (m/V)*F"],
+      "assumptions": ["标准和样品的显色及测量条件一致", "样品响应位于校准响应范围内", "m 以 ug、V 以 mL 代入时 m/V 的数值等于 mg/L", "线性模型需要结合残差与实验记录判断"],
+      "content_status": "source_verified",
+      "evidence_refs": ["project_guide_v1", "hj_t_345_2007"]
+    }
+  ],
+  "materials": [
+    {"resource_id": "hydrochloric_acid", "name": "盐酸", "role": "酸化", "parameters": [], "required_metadata": ["浓度", "批号", "配制或开封日期"], "content_status": "needs_review", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "hydroxylamine", "name": "盐酸羟胺溶液", "role": "还原剂", "parameters": [], "required_metadata": ["浓度", "批号", "配制日期"], "content_status": "needs_review", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "acetate_buffer", "name": "乙酸—乙酸铵缓冲液", "role": "控制显色 pH", "parameters": [{"name": "加入体积", "value": 5, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "required_metadata": ["配方", "批号", "配制日期"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "phenanthroline", "name": "邻菲啰啉溶液", "role": "显色剂", "parameters": [{"name": "加入体积", "value": 2, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "required_metadata": ["浓度", "批号", "配制日期"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "iron_working_standard", "name": "铁标准使用液", "role": "校准", "parameters": [{"name": "质量浓度", "value": 25.0, "unit": "ug/mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "required_metadata": ["证书", "批号", "配制日期"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "water_sample", "name": "水样", "role": "测定对象", "parameters": [], "required_metadata": ["样品 ID", "来源", "保存条件", "风险信息", "测定对象分支"], "content_status": "missing", "evidence_refs": ["project_guide_v1"]}
+  ],
+  "instruments": [
+    {"resource_id": "spectrophotometer", "name": "可见或紫外可见分光光度计", "role": "510 nm 吸光度测量", "parameters": [{"name": "计划波长", "value": 510, "unit": "nm", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "required_metadata": ["厂家", "型号", "仪器编号", "方法版本", "实际波长", "自检状态"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "cuvette", "name": "比色皿", "role": "吸光度测量", "parameters": [{"name": "默认光程", "value": 10, "unit": "mm", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "required_metadata": ["实际光程", "编号", "配对或检查状态"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"resource_id": "volumetric_glassware", "name": "容量瓶、移液管等容量器具", "role": "配制和定容", "parameters": [{"name": "校准系列终体积", "value": 50, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "required_metadata": ["规格", "编号", "校准状态"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}
+  ],
+  "safety": {
+    "ppe": ["实验服", "护目镜", "适合本次试剂的防护手套"],
+    "hazards": ["酸化未知水样前必须确认不存在未经评估的 CN-、S2- 等风险", "盐酸、盐酸羟胺、邻菲啰啉的具体危害和应急处置以 SDS 与本校制度为准", "加热和转移时防止烫伤、飞溅和容量器皿受热"],
+    "waste": ["含铁、邻菲啰啉、盐酸羟胺及酸性废液进入教师指定容器", "不得将未经确认的废液直接排入下水道"],
+    "emergency": ["出现样品风险不明、异常气体、明显飞溅或仪器异常时停止操作并通知教师", "具体急救和泄漏处置须由 SDS 与本校规程确认"],
+    "content_status": "needs_review",
+    "evidence_refs": ["project_guide_v1"]
+  },
+  "planned_steps": [
+    {"step_id": "P01", "stage": "preflight", "action": "核对样品风险、指导书版本、试剂标签、仪器与器具编号，准备空白原始记录表。", "parameters": [], "expected_observations": ["所有核对项有记录和确认人"], "hazards": ["未知样品不得直接酸化"], "stop_conditions": ["CN- 或 S2- 风险未经评估", "指导书或安全信息冲突未解决", "仪器自检失败"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1", "report_template_v1"]},
+    {"step_id": "P02", "stage": "calibration", "action": "分别移取 25.0 ug/mL 铁标准使用液 0、2.00、4.00、6.00、8.00、10.0 mL，建立 0、50.0、100、150、200、250 ug 校准系列。", "parameters": [{"name": "标准液体积序列", "value": "0,2.00,4.00,6.00,8.00,10.0", "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}, {"name": "铁质量序列", "value": "0,50.0,100,150,200,250", "unit": "ug", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "expected_observations": ["标准管编号与体积、铁质量一一对应"], "hazards": ["移液和试剂接触风险按 SDS 控制"], "stop_conditions": ["标准液身份或浓度无法确认", "移液记录缺失"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"step_id": "P03", "stage": "preparation", "action": "按指导书对标准和样品进行酸化、加盐酸羟胺并加热还原，浓缩至约 15 mL；记录实际加入量、加热时间与现象。", "parameters": [{"name": "计划浓缩体积", "value": 15, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "expected_observations": ["实际体积与现场现象由实验者记录"], "hazards": ["酸性溶液加热和飞溅", "未知样品酸化风险"], "stop_conditions": ["出现未经评估的气体或剧烈反应", "样品损失或加热失控"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"step_id": "P04", "stage": "preparation", "action": "冷却后定量转移，使用刚果红指示和饱和乙酸钠调节条件；记录实际转移和调节情况。", "parameters": [], "expected_observations": ["实际颜色和转移完整性由实验者记录"], "hazards": ["热溶液不得直接转入容量瓶"], "stop_conditions": ["样品未冷却", "发生可见样品损失"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"step_id": "P05", "stage": "operation", "action": "加入 5 mL 缓冲液和 2 mL 邻菲啰啉，定容至 50 mL，混匀并显色 15 min；记录显色开始和测量时间。", "parameters": [{"name": "缓冲液", "value": 5, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}, {"name": "邻菲啰啉", "value": 2, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}, {"name": "终体积", "value": 50, "unit": "mL", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}, {"name": "计划显色时间", "value": 15, "unit": "min", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "expected_observations": ["标准颜色随铁质量增加而加深；真实现象必须现场填写"], "hazards": ["显色剂和还原剂接触风险"], "stop_conditions": ["加液顺序或定容发生无法追溯的错误", "显色时间无法确认"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"step_id": "P06", "stage": "measurement", "action": "在 510 nm、默认 10 mm 光程下测量校准系列和样品吸光度，保存原始仪器文件；底色样品按确认的方法处理。", "parameters": [{"name": "计划波长", "value": 510, "unit": "nm", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}, {"name": "默认光程", "value": 10, "unit": "mm", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}], "expected_observations": ["校准响应总体随铁质量增加", "样品响应不得无依据外推"], "hazards": ["按仪器规程使用比色皿和仪器"], "stop_conditions": ["波长或光程无法确认", "样品响应超出校准范围", "仪器状态异常"], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"step_id": "P07", "stage": "cleanup", "action": "分类处置废液，清洁器皿和台面，归档原始记录、仪器文件、分析产物和报告。", "parameters": [], "expected_observations": ["清理和归档均有位置与确认人"], "hazards": ["废液混合相容性必须按本校规定确认"], "stop_conditions": ["废物去向不明确"], "content_status": "needs_review", "evidence_refs": ["project_guide_v1", "report_template_v1"]}
+  ],
+  "data_fields": [
+    {"field_id": "record_type", "label": "记录类型", "data_type": "string", "unit": null, "required": true, "source_method": "现场记录分类", "content_status": "source_verified"},
+    {"field_id": "sample_id", "label": "样品或标准管 ID", "data_type": "string", "unit": null, "required": true, "source_method": "标签和原始记录", "content_status": "user_provided"},
+    {"field_id": "replicate", "label": "重复编号", "data_type": "integer", "unit": null, "required": false, "source_method": "原始记录", "content_status": "user_provided"},
+    {"field_id": "standard_solution_volume_ml", "label": "铁标准使用液体积", "data_type": "number", "unit": "mL", "required": false, "source_method": "配制记录", "content_status": "user_provided"},
+    {"field_id": "iron_mass_ug", "label": "容量瓶中铁质量", "data_type": "number", "unit": "ug", "required": false, "source_method": "标准证书和移液体积，或校准反算", "content_status": "user_provided"},
+    {"field_id": "sample_volume_ml", "label": "水样取样体积", "data_type": "number", "unit": "mL", "required": false, "source_method": "实际取样记录", "content_status": "user_provided"},
+    {"field_id": "dilution_factor", "label": "总稀释倍数", "data_type": "number", "unit": null, "required": false, "source_method": "完整稀释链", "content_status": "user_provided"},
+    {"field_id": "color_start_time", "label": "显色开始时间", "data_type": "datetime", "unit": null, "required": false, "source_method": "现场记录", "content_status": "user_provided"},
+    {"field_id": "measurement_time", "label": "测量时间", "data_type": "datetime", "unit": null, "required": false, "source_method": "现场或仪器记录", "content_status": "user_provided"},
+    {"field_id": "absorbance_raw", "label": "原始吸光度", "data_type": "number", "unit": null, "required": false, "source_method": "仪器原始记录", "content_status": "user_provided"},
+    {"field_id": "absorbance_blank", "label": "试剂空白吸光度", "data_type": "number", "unit": null, "required": false, "source_method": "仪器原始记录", "content_status": "user_provided"},
+    {"field_id": "observation_text", "label": "真实现象或异常", "data_type": "string", "unit": null, "required": false, "source_method": "实验者现场记录", "content_status": "user_provided"}
+  ],
+  "analysis_plan": [
+    {"analysis_id": "blank_correction", "name": "吸光度空白校正", "tier": "automatic", "method": "A_corr=A_raw-A_blank", "input_field_ids": ["absorbance_raw", "absorbance_blank"], "required_outputs": ["absorbance_corrected"], "guidance_steps": [], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"analysis_id": "mass_calibration", "name": "铁质量—吸光度线性回归", "tier": "automatic", "method": "ordinary_least_squares_with_intercept", "input_field_ids": ["iron_mass_ug", "absorbance_corrected"], "required_outputs": ["calibration_intercept", "calibration_slope", "calibration_r_squared", "calibration_residuals"], "guidance_steps": [], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"analysis_id": "inverse_mass", "name": "由校准方程反算样品铁质量", "tier": "automatic", "method": "m=(A_corr-a)/b", "input_field_ids": ["absorbance_corrected", "calibration_intercept", "calibration_slope"], "required_outputs": ["calculated_iron_mass_ug"], "guidance_steps": [], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"analysis_id": "water_concentration", "name": "水样铁浓度换算", "tier": "automatic", "method": "rho=(m/V)*F", "input_field_ids": ["calculated_iron_mass_ug", "sample_volume_ml", "dilution_factor"], "required_outputs": ["water_iron_mg_per_l"], "guidance_steps": [], "content_status": "source_verified", "evidence_refs": ["project_guide_v1", "hj_t_345_2007"]},
+    {"analysis_id": "parallel_statistics", "name": "平行结果均值、样本标准偏差和 RSD", "tier": "automatic", "method": "mean_sample_sd_rsd", "input_field_ids": ["water_iron_mg_per_l"], "required_outputs": ["mean_mg_per_l", "sample_sd_mg_per_l", "rsd_percent"], "guidance_steps": [], "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"analysis_id": "origin_mass_linear_fit", "name": "Origin 铁质量校准与残差输出", "tier": "guided", "method": "Origin Linear Fit", "input_field_ids": ["iron_mass_ug", "absorbance_corrected"], "required_outputs": ["参数表", "拟合范围", "校准图", "残差图", "软件版本"], "guidance_steps": ["将 iron_mass_ug 设为 X、absorbance_corrected 设为 Y，并保留 sample_id。", "选择 Analysis > Fitting > Linear Fit；默认不固定截距，若教师要求固定必须登记依据。", "输出斜率、截距、R²、参数标准误、拟合范围和残差。", "参数表导出 CSV/XLSX，图表导出 PNG/SVG/PDF；.opju 仅归档。", "导入后核对样品 ID、单位、模型、拟合范围、参数和图表版本。"], "content_status": "source_verified", "evidence_refs": ["origin_linear_fit", "project_guide_v1"]}
+  ],
+  "quality_rules": [
+    {"rule_id": "method_range", "metric": "water_iron_mg_per_l", "operator": "between", "threshold": [0.12, 5.0], "on_fail": "require_remeasurement", "content_status": "source_verified", "evidence_refs": ["hj_t_345_2007", "project_guide_v1"]},
+    {"rule_id": "positive_slope", "metric": "calibration_slope", "operator": "gt", "threshold": 0, "on_fail": "block_report", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"rule_id": "sample_no_extrapolation", "metric": "sample_response_within_calibration", "operator": "equals", "threshold": true, "on_fail": "require_remeasurement", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"rule_id": "blank_acceptance", "metric": "reagent_blank", "operator": "manual_review", "threshold": null, "on_fail": "request_confirmation", "content_status": "needs_review", "evidence_refs": ["project_guide_v1"]},
+    {"rule_id": "linearity_and_residuals", "metric": "calibration_model_adequacy", "operator": "manual_review", "threshold": null, "on_fail": "request_confirmation", "content_status": "needs_review", "evidence_refs": ["project_guide_v1", "origin_linear_fit"]},
+    {"rule_id": "parallel_precision", "metric": "rsd_percent", "operator": "lte", "threshold": null, "on_fail": "request_confirmation", "content_status": "needs_review", "evidence_refs": ["project_guide_v1"]},
+    {"rule_id": "artifact_consistency", "metric": "table_plot_text_same_version", "operator": "equals", "threshold": true, "on_fail": "block_report", "content_status": "source_verified", "evidence_refs": ["report_template_v1", "origin_linear_fit"]}
+  ],
+  "thought_questions": [
+    {"item_id": "question_reduction", "text": "为什么总铁测定需要还原步骤？", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]},
+    {"item_id": "question_residuals", "text": "为什么不能仅凭 R² 判定校准有效？", "content_status": "source_verified", "evidence_refs": ["report_template_v1"]},
+    {"item_id": "question_matrix", "text": "有底色或浑浊的水样会怎样影响测量，应如何验证？", "content_status": "source_verified", "evidence_refs": ["project_guide_v1"]}
+  ],
+  "report_sections": ["preview", "materials_and_conditions", "design", "preflight", "procedure", "observations_and_raw_data", "preprocessing", "results", "quality_assessment", "error_analysis", "discussion", "conclusion", "cleanup_and_archive"],
+  "review": {
+    "guide_confirmed": false,
+    "formulas_confirmed": false,
+    "quality_rules_confirmed": false,
+    "safety_confirmed": false,
+    "confirmed_by": null,
+    "confirmed_at": null,
+    "notes": "项目编制版指导书和模板已完成来源与结构核验；它们不是本校或导师原版。测定分支、试剂配方、安全细则、仪器方法和质量阈值仍须教师确认。"
+  }
+}
