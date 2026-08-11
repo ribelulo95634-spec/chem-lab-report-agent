@@ -1,2 +1,57 @@
-# chem-lab-report-agent
-化学实验报告 Agent：从实验指导书生成预习报告、正式报告与一致性审查
+# ChemReport Agent
+
+一个面向大学化学实验的通用报告辅助工具。它读取导师提供的实验指导书，整理可追溯的预习报告，并在使用者补充真实操作、现象、原始数据和专业软件结果后生成正式报告草稿。
+
+## 在线功能
+
+- 搜索 18 个常见大学化学实验，快速生成标准报告结构。
+- 上传 DOCX、文本型 PDF、Markdown 或 TXT 指导书。
+- 提取实验目的、原理、仪器试剂、安全、步骤和数据处理要求。
+- 人工修正提取结果，缺失内容不会被自动编造。
+- 生成预习报告与正式报告草稿。
+- 下载 Markdown 和 Word 文件。
+- 不要求姓名、学号或班级，不建立个人档案。
+
+## 本地运行
+
+```powershell
+python -m pip install -r requirements.txt
+python -m streamlit run streamlit_app.py
+```
+
+打开 `http://localhost:8501` 即可使用。
+
+## 使用流程
+
+1. 搜索实验名称生成通用模板，或直接上传导师提供的指导书。
+2. 核对并修正识别出的实验结构和关键参数。
+3. 下载预习报告，完成实验后再填写真实记录。
+4. 导入计算结果或 Origin 等专业软件产物说明。
+5. 生成正式报告草稿，人工审核后提交。
+
+## 项目边界
+
+- 不编造实验数据、现象、计算结果或信息来源。
+- 扫描版 PDF 需要先做 OCR，旧版 DOC 需要另存为 DOCX 或 PDF。
+- 非线性拟合、光谱色谱分析和复杂模拟仍由专业软件完成。
+- 网页输出是待审核草稿，不替代实验指导书、教师要求、安全培训或学术责任。
+
+## 公开目录
+
+```text
+.
+├─ streamlit_app.py
+├─ web_app_utils.py
+├─ docs/                 常见实验标准流程参考
+├─ experiments/          两个可追溯示例配置
+├─ outputs/              示例预习报告与审查记录
+├─ schemas/              报告协议数据结构
+├─ scripts/              Word 导出与校验工具
+└─ tests/                网页与通用工作流测试
+```
+
+隐私说明见 [PRIVACY.md](PRIVACY.md)，参与开发见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 许可证
+
+MIT License，详见 [LICENSE](LICENSE)。
