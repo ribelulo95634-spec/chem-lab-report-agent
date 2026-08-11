@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/experiment-run.schema.json",
+  "title": "ExperimentRun v0.1",
+  "description": "某一次真实或公开数据实验运行记录。不得用计划值代替实际记录。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_id", "experiment_id", "spec_version", "run_status",
+    "participants", "started_at", "location", "actual_conditions", "actual_steps",
+    "observations", "raw_records", "corrections", "analysis_artifact_ids",
+    "error_analysis", "discussion", "conclusion", "thought_answers", "final_review"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1.0" },
+    "run_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+    "experiment_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "spec_version": { "type": "string", "const": "0.2.0" },
+    "run_status": { "type": "string", "enum": ["draft", "data_entered", "analysis_imported", "ready_for_review", "human_confirmed"] },
+    "participants": { "type": "array", "items": { "$ref": "#/$defs/participant" } },
+    "started_at": { "type": ["string", "null"], "format": "date-time" },
+    "ended_at": { "type": ["string", "null"], "format": "date-time" },
+    "location": { "$ref": "#/$defs/valueEntry" },
+    "actual_conditions": { "type": "array", "items": { "$ref": "#/$defs/valueEntry" } },
+    "actual_steps": { "type": "array", "items": { "$ref": "#/$defs/actualStep" } },
+    "observations": { "type": "array", "items": { "$ref": "#/$defs/observation" } },
+    "raw_records": { "type": "array", "items": { "$ref": "#/$defs/rawRecord" } },
+    "corrections": { "type": "array", "items": { "$ref": "#/$defs/correction" } },
+    "analysis_artifact_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "error_analysis": { "type": "array", "items": { "$ref": "#/$defs/narrativeItem" } },
+    "discussion": { "type": "array", "items": { "$ref": "#/$defs/narrativeItem" } },
+    "conclusion": { "$ref": "#/$defs/narrativeItem" },
+    "thought_answers": { "type": "array", "items": { "$ref": "#/$defs/narrativeItem" } },
+    "final_review": { "$ref": "#/$defs/finalReview" }
+  },
+  "$defs": {
+    "contentStatus": { "type": "string", "enum": ["source_verified", "user_provided", "software_imported", "model_draft", "missing", "needs_review"] },
+    "participant": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "role", "identifier", "content_status"],
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "role": { "type": "string" },
+        "identifier": { "type": ["string", "null"] },
+        "content_status": { "$ref": "#/$defs/contentStatus" }
+      }
+    },
+    "valueEntry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "value", "unit", "content_status", "provenance"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": ["number", "string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "provenance": { "type": "string" }
+      }
+    },
+    "actualStep": {
+      "type": "object", "additionalProperties": false,
+      "required": ["planned_step_id", "actual_action", "actual_parameters", "deviation", "recorded_at", "content_status"],
+      "properties": {
+        "planned_step_id": { "type": "string" },
+        "actual_action": { "type": ["string", "null"] },
+        "actual_parameters": { "type": "array", "items": { "$ref": "#/$defs/valueEntry" } },
+        "deviation": { "type": ["string", "null"] },
+        "recorded_at": { "type": ["string", "null"], "format": "date-time" },
+        "content_status": { "$ref": "#/$defs/contentStatus" }
+      }
+    },
+    "observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observation_id", "step_id", "text", "recorded_at", "content_status", "provenance"],
+      "properties": {
+        "observation_id": { "type": "string" },
+        "step_id": { "type": "string" },
+        "text": { "type": ["string", "null"] },
+        "recorded_at": { "type": ["string", "null"], "format": "date-time" },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "provenance": { "type": "string" }
+      }
+    },
+    "rawRecord": {
+      "type": "object", "additionalProperties": false,
+      "required": ["record_id", "values", "source_file", "recorded_at", "content_status"],
+      "properties": {
+        "record_id": { "type": "string" },
+        "values": { "type": "object" },
+        "source_file": { "type": ["string", "null"] },
+        "recorded_at": { "type": ["string", "null"], "format": "date-time" },
+        "content_status": { "$ref": "#/$defs/contentStatus" }
+      }
+    },
+    "correction": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target_path", "old_value", "new_value", "reason", "changed_by", "changed_at"],
+      "properties": {
+        "target_path": { "type": "string" },
+        "old_value": {},
+        "new_value": {},
+        "reason": { "type": "string", "minLength": 1 },
+        "changed_by": { "type": "string", "minLength": 1 },
+        "changed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "narrativeItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item_id", "text", "evidence_refs", "content_status"],
+      "properties": {
+        "item_id": { "type": "string" },
+        "text": { "type": ["string", "null"] },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } },
+        "content_status": { "$ref": "#/$defs/contentStatus" }
+      }
+    },
+    "finalReview": {
+      "type": "object", "additionalProperties": false,
+      "required": ["raw_data_confirmed", "actual_steps_confirmed", "analysis_confirmed", "report_confirmed", "reviewer", "reviewed_at", "notes"],
+      "properties": {
+        "raw_data_confirmed": { "type": "boolean" },
+        "actual_steps_confirmed": { "type": "boolean" },
+        "analysis_confirmed": { "type": "boolean" },
+        "report_confirmed": { "type": "boolean" },
+        "reviewer": { "type": ["string", "null"] },
+        "reviewed_at": { "type": ["string", "null"], "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
