@@ -1,0 +1,45 @@
+{
+  "status": "NEEDS_HUMAN_REVIEW",
+  "generated_view": "prelab_report",
+  "experiment_id": "ethanol_cyclohexane_water_lle",
+  "checks": {
+    "required_sections_present": true,
+    "invented_experimental_results": 0,
+    "blank_record_tables_present": true,
+    "origin_guidance_present": true,
+    "source_traceability_present": true,
+    "final_report_allowed": false
+  },
+  "issues": [
+    {
+      "code": "filename_content_mismatch",
+      "severity": "warning",
+      "message": "文件名写‘液–液传质系数测定’，正文实验实际为乙醇—环己烷—水三元液液平衡测定。报告按正文生成，提交前应确认课程要求的正式标题。",
+      "source_status": "source_verified"
+    },
+    {
+      "code": "formula_image_not_extracted",
+      "severity": "blocking_for_calculation",
+      "message": "旧版 DOC 中 K、β 公式为图片且未被文本提取；报告仅按常用定义恢复，计算前必须对照原版确认符号和相别。",
+      "source_status": "needs_review"
+    },
+    {
+      "code": "temperature_setpoint_missing",
+      "severity": "warning",
+      "message": "讲义要求恒温测量，但本次具体平衡釜设定温度未在可提取正文中明确；附录 25 °C 数据不能自动替代实验设定温度。",
+      "source_status": "missing"
+    },
+    {
+      "code": "refractive_index_curve_missing",
+      "severity": "blocking_for_composition_conversion",
+      "message": "折射率—组成标准曲线未随讲义文本一并取得，无法在预习阶段确定两相组成换算关系。",
+      "source_status": "missing"
+    },
+    {
+      "code": "local_safety_rules_unconfirmed",
+      "severity": "warning",
+      "message": "易燃、挥发和有机废液风险已作保守提示；具体 PPE、废液分类和应急流程仍应以本校实验室要求为准。",
+      "source_status": "needs_review"
+    }
+  ]
+}
