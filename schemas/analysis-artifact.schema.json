@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/analysis-artifact.schema.json",
+  "title": "AnalysisArtifact v0.1",
+  "description": "自动计算、指导式处理或专业软件导出的可追溯分析产物。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_id", "run_id", "analysis_id", "tier", "status",
+    "software", "method_name", "model", "source_files", "input_record_ids",
+    "parameters", "plots", "assumptions", "exported_at", "review"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.1.0" },
+    "artifact_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+    "run_id": { "type": "string" },
+    "analysis_id": { "type": "string" },
+    "tier": { "type": "string", "enum": ["automatic", "guided", "external"] },
+    "status": { "type": "string", "enum": ["complete", "partial", "missing", "needs_review"] },
+    "software": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": { "name": { "type": "string" }, "version": { "type": ["string", "null"] } }
+    },
+    "method_name": { "type": "string" },
+    "model": { "type": ["string", "null"] },
+    "source_files": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
+    "input_record_ids": { "type": "array", "items": { "type": "string" } },
+    "parameters": { "type": "array", "items": { "$ref": "#/$defs/resultValue" } },
+    "plots": { "type": "array", "items": { "$ref": "#/$defs/fileRef" } },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "exported_at": { "type": ["string", "null"], "format": "date-time" },
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["input_matches_run", "units_confirmed", "model_confirmed", "plot_matches_parameters", "reviewer", "reviewed_at", "notes"],
+      "properties": {
+        "input_matches_run": { "type": "boolean" },
+        "units_confirmed": { "type": "boolean" },
+        "model_confirmed": { "type": "boolean" },
+        "plot_matches_parameters": { "type": "boolean" },
+        "reviewer": { "type": ["string", "null"] },
+        "reviewed_at": { "type": ["string", "null"], "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "fileRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "media_type", "role", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "media_type": { "type": "string" },
+        "role": { "type": "string", "enum": ["raw_input", "parameter_table", "plot", "report", "native_project", "other"] },
+        "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "resultValue": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "value", "unit", "content_status", "source_locator"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": ["number", "string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "content_status": { "type": "string", "enum": ["source_verified", "user_provided", "software_imported", "model_draft", "missing", "needs_review"] },
+        "source_locator": { "type": "string" }
+      }
+    }
+  }
+}
