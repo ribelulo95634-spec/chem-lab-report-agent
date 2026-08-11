@@ -1,0 +1,46 @@
+{
+  "status": "NEEDS_HUMAN_REVIEW",
+  "counts": {
+    "blocking": 0,
+    "warning": 5,
+    "info": 1
+  },
+  "issues": [
+    {
+      "code": "spec_review_required",
+      "severity": "warning",
+      "message": "实验定义中的指导书、公式、质量规则或安全信息尚未全部人工确认",
+      "path": "spec.review"
+    },
+    {
+      "code": "external_output_missing",
+      "severity": "warning",
+      "message": "分析产物 origin_linear_fit_placeholder 尚未导入，仅可生成草稿",
+      "path": "artifacts[1]"
+    },
+    {
+      "code": "observations_missing",
+      "severity": "warning",
+      "message": "有 1 条实验现象等待填写",
+      "path": "run.observations"
+    },
+    {
+      "code": "conclusion_unconfirmed",
+      "severity": "warning",
+      "message": "结论尚未由真实数据和人工审核确认",
+      "path": "run.conclusion"
+    },
+    {
+      "code": "human_review_required",
+      "severity": "warning",
+      "message": "正式报告仍需用户或教师人工确认",
+      "path": "run.final_review"
+    },
+    {
+      "code": "mixed_source_scope",
+      "severity": "info",
+      "message": "配置同时引用标准和研究论文，报告必须分别说明适用对象，不能合并质量判据",
+      "path": "spec.sources"
+    }
+  ]
+}
