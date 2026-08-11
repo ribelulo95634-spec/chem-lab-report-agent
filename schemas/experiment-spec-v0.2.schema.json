@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/experiment-spec-v0.2.schema.json",
+  "title": "ExperimentSpec v0.2",
+  "description": "标准实验定义。只保存计划、来源和报告要求，不保存某一次实验的真实数据。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "experiment_id", "experiment_name", "category", "status",
+    "sources", "objectives", "principles", "materials", "instruments", "safety",
+    "planned_steps", "data_fields", "analysis_plan", "quality_rules",
+    "report_sections", "review"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "0.2.0" },
+    "experiment_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "experiment_name": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "enum": ["basic", "inorganic", "analytical", "organic", "physical", "instrumental", "comprehensive"] },
+    "status": { "type": "string", "enum": ["draft", "source_verified", "human_confirmed", "validated", "deprecated"] },
+    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" }, "minItems": 1 },
+    "objectives": { "type": "array", "items": { "$ref": "#/$defs/contentItem" }, "minItems": 1 },
+    "principles": { "type": "array", "items": { "$ref": "#/$defs/principle" }, "minItems": 1 },
+    "materials": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
+    "instruments": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
+    "safety": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ppe", "hazards", "waste", "emergency", "content_status", "evidence_refs"],
+      "properties": {
+        "ppe": { "type": "array", "items": { "type": "string" } },
+        "hazards": { "type": "array", "items": { "type": "string" } },
+        "waste": { "type": "array", "items": { "type": "string" } },
+        "emergency": { "type": "array", "items": { "type": "string" } },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "planned_steps": { "type": "array", "items": { "$ref": "#/$defs/plannedStep" }, "minItems": 1 },
+    "data_fields": { "type": "array", "items": { "$ref": "#/$defs/dataField" }, "minItems": 1 },
+    "analysis_plan": { "type": "array", "items": { "$ref": "#/$defs/analysisTask" } },
+    "quality_rules": { "type": "array", "items": { "$ref": "#/$defs/qualityRule" } },
+    "thought_questions": { "type": "array", "items": { "$ref": "#/$defs/contentItem" } },
+    "report_sections": {
+      "type": "array", "minItems": 13, "uniqueItems": true,
+      "items": { "type": "string", "enum": [
+        "preview", "materials_and_conditions", "design", "preflight", "procedure",
+        "observations_and_raw_data", "preprocessing", "results", "quality_assessment",
+        "error_analysis", "discussion", "conclusion", "cleanup_and_archive"
+      ] }
+    },
+    "review": { "$ref": "#/$defs/review" }
+  },
+  "$defs": {
+    "contentStatus": { "type": "string", "enum": ["source_verified", "user_provided", "software_imported", "model_draft", "missing", "needs_review"] },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_id", "title", "source_type", "location", "verified"],
+      "properties": {
+        "source_id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+        "title": { "type": "string", "minLength": 1 },
+        "source_type": { "type": "string", "enum": ["instructor_guide", "course_syllabus", "standard", "textbook", "research_paper", "instrument_manual", "reference_database", "internal_record"] },
+        "location": { "type": "string", "minLength": 1 },
+        "version": { "type": ["string", "null"] },
+        "verified": { "type": "boolean" },
+        "evidence_locator": { "type": ["string", "null"] }
+      }
+    },
+    "contentItem": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item_id", "text", "content_status", "evidence_refs"],
+      "properties": {
+        "item_id": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$" },
+        "text": { "type": "string", "minLength": 1 },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "principle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["principle_id", "text", "equations", "assumptions", "content_status", "evidence_refs"],
+      "properties": {
+        "principle_id": { "type": "string" },
+        "text": { "type": "string", "minLength": 1 },
+        "equations": { "type": "array", "items": { "type": "string" } },
+        "assumptions": { "type": "array", "items": { "type": "string" } },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+    "parameter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "value", "unit", "content_status", "evidence_refs"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": ["number", "string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "resource": {
+      "type": "object", "additionalProperties": false,
+      "required": ["resource_id", "name", "role", "parameters", "content_status", "evidence_refs"],
+      "properties": {
+        "resource_id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "parameters": { "type": "array", "items": { "$ref": "#/$defs/parameter" } },
+        "required_metadata": { "type": "array", "items": { "type": "string" } },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "plannedStep": {
+      "type": "object", "additionalProperties": false,
+      "required": ["step_id", "stage", "action", "parameters", "expected_observations", "hazards", "stop_conditions", "content_status", "evidence_refs"],
+      "properties": {
+        "step_id": { "type": "string" },
+        "stage": { "type": "string", "enum": ["preflight", "calibration", "preparation", "operation", "measurement", "cleanup"] },
+        "action": { "type": "string" },
+        "parameters": { "type": "array", "items": { "$ref": "#/$defs/parameter" } },
+        "expected_observations": { "type": "array", "items": { "type": "string" } },
+        "hazards": { "type": "array", "items": { "type": "string" } },
+        "stop_conditions": { "type": "array", "items": { "type": "string" } },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+    "dataField": {
+      "type": "object", "additionalProperties": false,
+      "required": ["field_id", "label", "data_type", "unit", "required", "source_method", "content_status"],
+      "properties": {
+        "field_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "label": { "type": "string" },
+        "data_type": { "type": "string", "enum": ["number", "integer", "string", "boolean", "datetime", "file"] },
+        "unit": { "type": ["string", "null"] },
+        "required": { "type": "boolean" },
+        "source_method": { "type": "string" },
+        "content_status": { "$ref": "#/$defs/contentStatus" }
+      }
+    },
+    "analysisTask": {
+      "type": "object", "additionalProperties": false,
+      "required": ["analysis_id", "name", "tier", "method", "input_field_ids", "required_outputs", "guidance_steps", "content_status", "evidence_refs"],
+      "properties": {
+        "analysis_id": { "type": "string" },
+        "name": { "type": "string" },
+        "tier": { "type": "string", "enum": ["automatic", "guided", "external"] },
+        "method": { "type": "string" },
+        "input_field_ids": { "type": "array", "items": { "type": "string" } },
+        "required_outputs": { "type": "array", "items": { "type": "string" } },
+        "guidance_steps": { "type": "array", "items": { "type": "string" } },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "qualityRule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rule_id", "metric", "operator", "threshold", "on_fail", "content_status", "evidence_refs"],
+      "properties": {
+        "rule_id": { "type": "string" },
+        "metric": { "type": "string" },
+        "operator": { "type": "string", "enum": ["lt", "lte", "gt", "gte", "between", "equals", "manual_review"] },
+        "threshold": { "type": ["number", "string", "array", "boolean", "null"] },
+        "on_fail": { "type": "string", "enum": ["flag", "request_confirmation", "require_remeasurement", "block_report"] },
+        "content_status": { "$ref": "#/$defs/contentStatus" },
+        "evidence_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["guide_confirmed", "formulas_confirmed", "quality_rules_confirmed", "safety_confirmed", "confirmed_by", "confirmed_at", "notes"],
+      "properties": {
+        "guide_confirmed": { "type": "boolean" },
+        "formulas_confirmed": { "type": "boolean" },
+        "quality_rules_confirmed": { "type": "boolean" },
+        "safety_confirmed": { "type": "boolean" },
+        "confirmed_by": { "type": ["string", "null"] },
+        "confirmed_at": { "type": ["string", "null"], "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
