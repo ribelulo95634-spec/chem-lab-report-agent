@@ -322,7 +322,10 @@ def parse_md_table(lines: list[str], start: int) -> tuple[list[list[str]], int]:
     rows: list[list[str]] = []
     index = start
     while index < len(lines) and lines[index].strip().startswith("|"):
-        values = [clean_markdown(cell.strip().replace("<br>", "\n")) for cell in lines[index].strip().strip("|").split("|")]
+        values = [
+            clean_markdown(cell.strip().replace("\\|", "|").replace("<br>", "\n"))
+            for cell in re.split(r"(?<!\\)\|", lines[index].strip().strip("|"))
+        ]
         if index != start + 1:
             rows.append(values)
         index += 1

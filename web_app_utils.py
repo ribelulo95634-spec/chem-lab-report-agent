@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import io
 import json
@@ -14,6 +15,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 MAX_SOURCE_CHARS = 120_000
+MAX_PROJECT_PACKAGE_BYTES = 5 * 1024 * 1024
+PROJECT_SCHEMA_VERSION = "chemreport.project.v0.2"
+SUPPORTED_PROJECT_SCHEMA_VERSIONS = {"chemreport.project.v0.1", PROJECT_SCHEMA_VERSION}
+DATA_COLUMNS = ("数据项", "单位", "原始值", "备注")
+DATA_COLUMN_ALIASES = {
+    "数据项": {"数据项", "项目", "名称", "样品", "item", "name", "sample"},
+    "单位": {"单位", "unit"},
+    "原始值": {"原始值", "数值", "值", "value", "rawvalue", "raw_value"},
+    "备注": {"备注", "说明", "note", "notes", "comment"},
+}
+FORMAL_INPUT_FIELDS = (
+    "actual_procedure",
+    "observations",
+    "raw_data",
+    "software_results",
+    "error_analysis",
+    "conclusion",
+)
 
 COMMON_EXPERIMENTS = [
     "容量器皿使用与标准溶液配制",
@@ -93,6 +112,111 @@ def load_entry(key: str) -> tuple[ExperimentEntry, dict, str, dict]:
 def safe_text(value: str, fallback: str = "未填写") -> str:
     cleaned = re.sub(r"[\r\n|]+", " ", str(value).strip())
     return cleaned or fallback
+
+
+def normalize_data_rows(rows) -> list[dict[str, str]]:
+    """Normalize tabular experiment records to the four public columns."""
+
+    if rows is None:
+        return []
+    if hasattr(rows, "to_dict"):
+        rows = rows.to_dict("records")
+    if not isinstance(rows, list):
+        raise ValueError("结构化数据必须是表格行列表。")
+    normalized: list[dict[str, str]] = []
+    for raw_row in rows[:500]:
+        if not isinstance(raw_row, dict):
+            continue
+        row = {
+            column: str(raw_row.get(column, "")).strip()[:2000]
+            for column in DATA_COLUMNS
+        }
+        if any(row.values()):
+            normalized.append(row)
+    return normalized
+
+
+def _canonical_data_column(column: str) -> str | None:
+    normalized = re.sub(r"[\s\-]+", "", str(column).strip()).lower()
+    for canonical, aliases in DATA_COLUMN_ALIASES.items():
+        if normalized in {re.sub(r"[\s\-]+", "", alias).lower() for alias in aliases}:
+            return canonical
+    return None
+
+
+def _rows_from_grid(values: list[list[object]]) -> list[dict[str, str]]:
+    if not values:
+        raise ValueError("数据文件中没有可读取的内容。")
+    headers = [str(value).strip() if value is not None else "" for value in values[0]]
+    mapped = [_canonical_data_column(header) for header in headers]
+    if not any(mapped):
+        if len(headers) > len(DATA_COLUMNS):
+            raise ValueError("未识别表头，请使用：数据项、单位、原始值、备注。")
+        mapped = list(DATA_COLUMNS[: len(headers)])
+    rows: list[dict[str, str]] = []
+    for values_row in values[1:501]:
+        row = {column: "" for column in DATA_COLUMNS}
+        for index, value in enumerate(values_row):
+            if index >= len(mapped) or mapped[index] is None:
+                continue
+            row[mapped[index]] = "" if value is None else str(value).strip()
+        rows.append(row)
+    normalized = normalize_data_rows(rows)
+    if not normalized:
+        raise ValueError("数据文件中没有有效数据行。")
+    return normalized
+
+
+def extract_structured_data_file(file_name: str, data: bytes) -> dict:
+    """Extract a CSV or XLSX experiment data table in memory."""
+
+    if not data:
+        raise ValueError("数据文件为空。")
+    if len(data) > 5 * 1024 * 1024:
+        raise ValueError("数据文件超过 5 MB，请压缩或拆分后重试。")
+    suffix = Path(file_name).suffix.lower()
+    if suffix == ".csv":
+        text = _decode_text(data)
+        values = list(csv.reader(io.StringIO(text)))
+        rows, method = _rows_from_grid(values), "csv"
+    elif suffix == ".xlsx":
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+        sheet = workbook.active
+        values = [list(row) for row in sheet.iter_rows(values_only=True)]
+        workbook.close()
+        rows, method = _rows_from_grid(values), "xlsx"
+    else:
+        raise ValueError("暂支持 CSV 和 XLSX 数据文件。")
+    return {"file_name": Path(file_name).name, "method": method, "rows": rows}
+
+
+def build_data_template_csv() -> bytes:
+    output = io.StringIO()
+    writer = csv.writer(output, lineterminator="\n")
+    writer.writerow(DATA_COLUMNS)
+    writer.writerow(["样品1", "mL", "", "保留原始读数"])
+    return ("\ufeff" + output.getvalue()).encode("utf-8")
+
+
+def format_data_rows_markdown(rows) -> str:
+    normalized = normalize_data_rows(rows)
+    if not normalized:
+        return ""
+
+    def cell(value: str) -> str:
+        return value.replace("|", "\\|").replace("\r", " ").replace("\n", " ")
+
+    lines = [
+        "| 数据项 | 单位 | 原始值 | 备注 |",
+        "| --- | --- | --- | --- |",
+    ]
+    lines.extend(
+        "| " + " | ".join(cell(row[column]) for column in DATA_COLUMNS) + " |"
+        for row in normalized
+    )
+    return "\n".join(lines)
 
 
 def _decode_text(data: bytes) -> str:
@@ -228,6 +352,126 @@ def _section(value: str, fallback: str = "【指导书中未识别到，请人�
     return value.strip() or fallback
 
 
+def inspect_report_readiness(
+    *,
+    actual_procedure: str,
+    observations: str,
+    raw_data: str,
+    software_results: str,
+    error_analysis: str,
+    conclusion: str,
+    data_rows=None,
+) -> dict:
+    """Summarize missing user-supplied evidence before report export."""
+
+    structured_rows = normalize_data_rows(data_rows)
+    required = {
+        "实际操作与计划偏差": actual_procedure,
+        "真实实验现象": observations,
+        "原始数据": raw_data or ("structured_data" if structured_rows else ""),
+        "计算结果或专业软件产物": software_results,
+        "误差分析": error_analysis,
+        "实验结论": conclusion,
+    }
+    missing = [label for label, value in required.items() if not value.strip()]
+    return {
+        "is_ready": not missing,
+        "completed_count": len(required) - len(missing),
+        "total_count": len(required),
+        "missing": missing,
+    }
+
+
+def build_project_package(
+    source: dict,
+    analysis: dict,
+    formal_inputs: dict | None = None,
+    data_rows=None,
+) -> bytes:
+    """Build a portable project file so a user can continue later."""
+
+    inputs = formal_inputs or {}
+    package = {
+        "schema_version": PROJECT_SCHEMA_VERSION,
+        "source": {
+            "file_name": str(source.get("file_name", "未命名指导书")),
+            "sha256": str(source.get("sha256", "")),
+            "method": str(source.get("method", "unknown")),
+            "text": str(source.get("text", "")),
+        },
+        "analysis": {
+            "experiment_name": str(analysis.get("experiment_name", "未命名实验")),
+            "sections": {
+                key: str(analysis.get("sections", {}).get(key, ""))
+                for key in SECTION_RULES
+            },
+            "source_excerpt": str(analysis.get("source_excerpt", "")),
+        },
+        "formal_inputs": {
+            key: str(inputs.get(key, ""))
+            for key in FORMAL_INPUT_FIELDS
+        },
+        "data_rows": normalize_data_rows(data_rows),
+    }
+    return json.dumps(package, ensure_ascii=False, indent=2).encode("utf-8")
+
+
+def load_project_package(data: bytes) -> dict:
+    """Validate and normalize a portable ChemReport project file."""
+
+    if not data:
+        raise ValueError("项目文件为空。")
+    if len(data) > MAX_PROJECT_PACKAGE_BYTES:
+        raise ValueError("项目文件超过 5 MB，请确认文件是否来自 ChemReport。")
+    try:
+        package = json.loads(data.decode("utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("项目文件不是有效的 UTF-8 JSON。") from exc
+    if not isinstance(package, dict) or package.get("schema_version") not in SUPPORTED_PROJECT_SCHEMA_VERSIONS:
+        raise ValueError("项目文件版本不受支持，请使用 ChemReport 导出的项目文件。")
+
+    source = package.get("source")
+    analysis = package.get("analysis")
+    if not isinstance(source, dict) or not isinstance(analysis, dict):
+        raise ValueError("项目文件缺少指导书或解析结果。")
+    source_text = source.get("text")
+    source_hash = source.get("sha256")
+    if not isinstance(source_text, str) or not source_text.strip():
+        raise ValueError("项目文件中没有可恢复的指导书文字。")
+    if not isinstance(source_hash, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", source_hash):
+        raise ValueError("项目文件中的来源哈希无效。")
+
+    sections = analysis.get("sections")
+    if not isinstance(sections, dict):
+        raise ValueError("项目文件中的章节结构无效。")
+    normalized_sections = {
+        key: str(sections.get(key, ""))
+        for key in SECTION_RULES
+    }
+    normalized_analysis = {
+        "experiment_name": str(analysis.get("experiment_name", "未命名实验")),
+        "sections": normalized_sections,
+        "missing_sections": [key for key, value in normalized_sections.items() if not value.strip()],
+        "source_excerpt": str(analysis.get("source_excerpt", ""))[:8000],
+    }
+    inputs = package.get("formal_inputs") if isinstance(package.get("formal_inputs"), dict) else {}
+    return {
+        "schema_version": PROJECT_SCHEMA_VERSION,
+        "source": {
+            "file_name": Path(str(source.get("file_name", "未命名指导书"))).name,
+            "sha256": source_hash.lower(),
+            "method": str(source.get("method", "restored_project")),
+            "text": source_text[:MAX_SOURCE_CHARS],
+        },
+        "analysis": normalized_analysis,
+        "formal_inputs": {
+            key: str(inputs.get(key, ""))
+            for key in FORMAL_INPUT_FIELDS
+        },
+        "data_rows": normalize_data_rows(package.get("data_rows", [])),
+    }
+
+
 def build_prelab_report(analysis: dict, source: dict) -> str:
     sections = analysis["sections"]
     missing = "、".join(analysis["missing_sections"]) or "无"
@@ -299,19 +543,24 @@ def build_formal_report(
     software_results: str,
     error_analysis: str,
     conclusion: str,
+    data_rows=None,
 ) -> str:
     sections = analysis["sections"]
-    provided = {
-        "实际步骤": actual_procedure,
-        "实验现象": observations,
-        "原始数据": raw_data,
-        "软件结果": software_results,
-        "误差分析": error_analysis,
-        "实验结论": conclusion,
-    }
-    missing = [name for name, value in provided.items() if not value.strip()]
+    readiness = inspect_report_readiness(
+        actual_procedure=actual_procedure,
+        observations=observations,
+        raw_data=raw_data,
+        software_results=software_results,
+        error_analysis=error_analysis,
+        conclusion=conclusion,
+        data_rows=data_rows,
+    )
+    missing = readiness["missing"]
     status = "NEEDS_HUMAN_REVIEW"
     missing_text = "、".join(missing) or "无，但仍需人工审核"
+    structured_data = format_data_rows_markdown(data_rows)
+    raw_data_section = structured_data or "【缺失：请填写结构化原始数据，或在补充说明中粘贴原始记录】"
+    raw_data_notes = raw_data.strip() or "【无补充说明】"
     return f"""# {safe_text(analysis['experiment_name'])} - 正式实验报告草稿
 
 > 状态：{status}。真实实验内容只来自用户本次填写或外部软件导出，不根据指导书推测结果。
@@ -346,8 +595,12 @@ def build_formal_report(
 
 ## 原始数据
 
+{raw_data_section}
+
+### 原始数据补充说明
+
 ```text
-{raw_data.strip() or '【缺失：请粘贴原始数据，保留单位、样品编号和有效数字】'}
+{raw_data_notes}
 ```
 
 ## 数据处理与专业软件产物

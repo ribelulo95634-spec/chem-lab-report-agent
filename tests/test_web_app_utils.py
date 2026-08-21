@@ -1,4 +1,5 @@
 import io
+import json
 import unittest
 
 from docx import Document
@@ -6,12 +7,17 @@ from docx import Document
 from web_app_utils import (
     CATALOG,
     analyze_guide_text,
+    build_project_package,
     build_formal_report,
     build_prelab_report,
     build_standard_report_template,
+    extract_structured_data_file,
     extract_uploaded_document,
+    format_data_rows_markdown,
     load_entry,
+    inspect_report_readiness,
     markdown_to_docx_bytes,
+    load_project_package,
 )
 
 
@@ -66,8 +72,106 @@ class WebAppUtilsTests(unittest.TestCase):
             conclusion="",
         )
         self.assertIn("【缺失：请填写本次真实观察", report)
-        self.assertIn("【缺失：请粘贴原始数据", report)
+        self.assertIn("【缺失：请填写结构化原始数据", report)
         self.assertIn("NEEDS_HUMAN_REVIEW", report)
+
+    def test_csv_data_import_accepts_common_headers(self):
+        imported = extract_structured_data_file(
+            "data.csv",
+            "样品,Unit,Value,说明\n样品A,mL,24.30,初始读数\n".encode("utf-8"),
+        )
+        self.assertEqual(imported["method"], "csv")
+        self.assertEqual(
+            imported["rows"],
+            [{"数据项": "样品A", "单位": "mL", "原始值": "24.30", "备注": "初始读数"}],
+        )
+
+    def test_xlsx_data_import_and_markdown_output(self):
+        from openpyxl import Workbook
+
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["数据项", "单位", "原始值", "备注"])
+        sheet.append(["吸光度", "AU", 0.456, "样品|1"])
+        output = io.BytesIO()
+        workbook.save(output)
+        workbook.close()
+
+        imported = extract_structured_data_file("results.xlsx", output.getvalue())
+        markdown = format_data_rows_markdown(imported["rows"])
+        self.assertEqual(imported["method"], "xlsx")
+        self.assertIn("| 吸光度 | AU | 0.456 | 样品\\|1 |", markdown)
+
+        document = Document(io.BytesIO(markdown_to_docx_bytes("# 数据报告\n\n" + markdown)))
+        self.assertEqual(document.tables[0].rows[1].cells[3].text, "样品|1")
+
+    def test_report_readiness_identifies_missing_user_evidence(self):
+        readiness = inspect_report_readiness(
+            actual_procedure="完成滴定",
+            observations="溶液变为浅红色",
+            raw_data="24.30 mL",
+            software_results="线性拟合 R2=0.998",
+            error_analysis="终点判断存在读数误差",
+            conclusion="结果满足要求",
+        )
+        self.assertTrue(readiness["is_ready"])
+        self.assertEqual(readiness["completed_count"], 6)
+
+        missing = inspect_report_readiness(
+            actual_procedure="",
+            observations="",
+            raw_data="1.0 g",
+            software_results="",
+            error_analysis="",
+            conclusion="",
+        )
+        self.assertFalse(missing["is_ready"])
+        self.assertIn("真实实验现象", missing["missing"])
+
+        structured = inspect_report_readiness(
+            actual_procedure="完成滴定",
+            observations="溶液变为浅红色",
+            raw_data="",
+            software_results="线性拟合 R2=0.998",
+            error_analysis="终点判断存在读数误差",
+            conclusion="结果满足要求",
+            data_rows=[{"数据项": "滴定体积", "单位": "mL", "原始值": "24.30", "备注": ""}],
+        )
+        self.assertTrue(structured["is_ready"])
+
+    def test_project_package_round_trip_restores_progress(self):
+        source = extract_uploaded_document(
+            "guide.md",
+            "# 酸碱滴定\n\n## 实验目的\n掌握滴定".encode("utf-8"),
+        )
+        analysis = analyze_guide_text(source["text"], "酸碱滴定")
+        payload = build_project_package(
+            source,
+            analysis,
+            {"raw_data": "24.30 mL", "observations": "浅红色保持 30 秒"},
+            [{"数据项": "滴定体积", "单位": "mL", "原始值": "24.30", "备注": "第1次"}],
+        )
+        restored = load_project_package(payload)
+        self.assertEqual(restored["source"]["sha256"], source["sha256"])
+        self.assertEqual(restored["analysis"]["experiment_name"], "酸碱滴定")
+        self.assertEqual(restored["formal_inputs"]["raw_data"], "24.30 mL")
+        self.assertEqual(restored["formal_inputs"]["observations"], "浅红色保持 30 秒")
+        self.assertEqual(restored["data_rows"][0]["原始值"], "24.30")
+
+    def test_version_one_project_migrates_without_structured_rows(self):
+        source = extract_uploaded_document("guide.txt", "实验目的：测试".encode("utf-8"))
+        analysis = analyze_guide_text(source["text"], "迁移测试")
+        package = json.loads(build_project_package(source, analysis).decode("utf-8"))
+        package["schema_version"] = "chemreport.project.v0.1"
+        package.pop("data_rows")
+
+        restored = load_project_package(json.dumps(package, ensure_ascii=False).encode("utf-8"))
+        self.assertEqual(restored["schema_version"], "chemreport.project.v0.2")
+        self.assertEqual(restored["data_rows"], [])
+
+    def test_project_package_rejects_unknown_version(self):
+        with self.assertRaisesRegex(ValueError, "版本不受支持"):
+            load_project_package(b'{"schema_version":"unknown"}')
 
     def test_legacy_doc_has_actionable_error(self):
         with self.assertRaisesRegex(ValueError, "另存为 .docx"):
